@@ -1,18 +1,25 @@
-// Part Two - Movies App!
-// Build an application that uses jQuery to do the following:
-// Contains a form with two inputs for a title and rating along with a button to submit the form.
-// When the form is submitted, capture the values for each of the inputs and append them to the DOM along with a button to remove each title and rating from the DOM.
-// When the button to remove is clicked, remove each title and rating from the DOM.
 
+function createGif(res) {
+    const gif = res.data.length;
+    let randGif = Math.floor(Math.random() * gif);
+    let $newDiv = $("<div>");
+    let $newGif = $("<img>", {src: res.data[randGif].images.original.url})
+    $newDiv.append($newGif);
+    $("div").append($newDiv);
+}
 
-$("#submit").on("click", function(e){
-    e.preventDefault();
-    let movie = $("#movie").val();
-    let rank = $("#rank").val();
-    $('body').append(`<div id="newDiv">${movie} is a ${rank} / 10</div>`).append('<button id="delete">Delete</button>');
-    $('#delete').on('click', function(e){
-      $('#newDiv, #delete').remove();
-    });
-    $('#movie').val('');
-    $('#rank').val('');
-})
+$("form").on("submit", async function(e) {
+     e.preventDefault();
+     const keyword = $("#input-form").val();
+     const res = await axios.get('http://api.giphy.com/v1/gifs/search', { params: {q: keyword, api_key: "di6RKA1QQhdgJtYo7OgjRW9664gX6iVl"}})
+     console.log(res);
+     $("#input-form").val("");
+     createGif(res.data);
+ })
+ 
+ $("#delete-btn").on("click", function() {
+    $("div").empty();
+  });
+
+ 
+//  keeps doubling my images, work with Don on this.
