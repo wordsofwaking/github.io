@@ -1,0 +1,12 @@
+autopep8==1.4.4
+blinker==1.4
+Click==7.0
+Flask==1.1.1
+Flask-DebugToolbar==0.13.1
+importlib-metadata==4.11.3
+itsdangerous==1.1.0
+Jinja2==2.10.3
+MarkupSafe==1.1.1
+pycodestyle==2.5.0
+Werkzeug==0.16.0
+zipp==3.8.0
