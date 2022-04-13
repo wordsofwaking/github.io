@@ -1,0 +1,9 @@
+{% extends 'question_0.html' %}
+
+{% block content %}    
+    <p>Did someone else shop with you today?</p>
+    <form action="/question/2">
+        <input type="text" placeholder="your response" name="answer">
+        <button>Submit!</button>
+      </form>
+{% endblock %}

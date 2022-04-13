@@ -1,0 +1,9 @@
+{% extends 'question_0.html' %}
+
+{% block content %}    
+    <p>On average, how much do you spend a month on frisbees?  Less or more than $10,000?</p>
+    <form action="/question/3">
+        <input type="text" placeholder="your response" name="answer">
+        <button>Submit!</button>
+      </form>
+{% endblock %}

@@ -7,14 +7,17 @@
     <title>Base</title>
 </head>
 <body>
-    <h1>Madlibs</h1>
-    <form action="/madlib">
-        {% for prompt in prompts %}
-          <p>{{ prompt }}:
-            <input name="{{ prompt }}">
-          </p>
-        {% endfor %}
-        <button>Submit</button>
+    {% for msg in get_flashed_messages() %}
+    <h1> {{msg}} </h1>
+    {% endfor %}
+
+
+    <h1>Customer Satisfaction Survey</h1>
+    <p>Please fill out a survey about your experience with us.</p>
+    <hr>
+    <form action="/question/0">
+        <button>Begin Survey</button>
     </form>
+
 </body>
 </html>
