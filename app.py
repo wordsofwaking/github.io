@@ -1,71 +1,48 @@
-from flask import Flask, render_template, request, redirect, flash, session
-from flask_debugtoolbar import DebugToolbarExtension
-from markupsafe import escape
 
-RESPONSES = "response"
+from flask import Flask, request, render_template, jsonify, session
+from boggle import Boggle
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "secret"
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-debug = DebugToolbarExtension(app)
+app.config["SECRET_KEY"] = "fdfgkjtjkkg45yfdb"
+
+boggle_game = Boggle()
 
 
+@app.route("/")
+def homepage():
+    """Show board."""
 
-@app.route('/')
-def start_survey():
-    """Explains and starts the survey"""
-    
-    session[RESPONSES] = []
+    board = boggle_game.make_board()
+    session['board'] = board
+    highscore = session.get("highscore", 0)
+    nplays = session.get("nplays", 0)
 
-    return render_template("base.html")
-
-
-@app.route('/responses', methods=["POST"])
-def add_answer():
-    """Record survey answers"""
-    cust_answer = request.form['answer']
-    
-    response = session[RESPONSES]
-    response.append(cust_answer)
-    session[RESPONSES] = response
-
-    if (len(response) == 3):
-        return redirect('/thank_you')
-    
-    else:
-        return redirect(f"/question_{len(response)}/")
+    return render_template("index.html", board=board,
+                           highscore=highscore,
+                           nplays=nplays)
 
 
-@app.route('/question/0')
-def first_question():
-    """Ask the first question of the survey"""
+@app.route("/check-word")
+def check_word():
+    """Check if word is in dictionary."""
 
-    return render_template("question_0.html")
+    word = request.args["word"]
+    board = session["board"]
+    response = boggle_game.check_valid_word(board, word)
 
-
-@app.route('/question/1')
-def second_question():
-    """Ask the second question of the survey"""
-
-    return render_template("question_1.html")
+    return jsonify({'result': response})
 
 
-@app.route('/question/2')
-def third_question():
-    """Ask the third question of the survey"""
+@app.route("/post-score", methods=["POST"])
+def post_score():
+    """Receive score, update nplays, update high score if appropriate."""
 
-    return render_template("question_2.html")
+    score = request.json["score"]
+    highscore = session.get("highscore", 0)
+    nplays = session.get("nplays", 0)
 
+    session['nplays'] = nplays + 1
+    session['highscore'] = max(score, highscore)
 
-@app.route('/question/3')
-def last_question():
-    """Ask the last question of the survey"""
+    return jsonify(brokeRecord=score > highscore)
 
-    return render_template("question_3.html")
-
-
-@app.route('/thank_you')
-def redirect_to_home():
-    """Redirects to home page with flash message"""
-    flash('Thank you for taking our survey!')
-    return redirect("/")
