@@ -1,4 +1,4 @@
-"""Models for Blogly."""
+"""Models for WTForms."""
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 
@@ -6,64 +6,71 @@ db = SQLAlchemy()
 
 DEFAULT_IMAGE_URL = "https://png.pngtree.com/png-clipart/20191120/original/pngtree-outline-user-icon-png-image_5045523.jpg"
 
-class User(db.Model):
+class Pet(db.Model):
     """Table User"""
 
-    __tablename__ = "users"
+    __tablename__ = "pet"
     id = db.Column (db.Integer, primary_key=True, autoincrement=True)
-    first_name = db.Column (db.Text, nullable=False, unique=False)
-    last_name = db.Column (db.Text, nullable=False, unique=False)
-    image_url = db.Column(db.Text, nullable=False, default=DEFAULT_IMAGE_URL)
+    name = db.Column (db.Text, nullable=False, unique=False)
+    species = db.Column (db.Text, nullable=False, unique=False)
+    photo_url = db.Column(db.Text, nullable=True)
+    age = db.Column(db.Integer, nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    available = db.Column(db.Boolean, nullable=False, default=True)
 
-    posts = db.relationship("Post", backref="user", cascade="all, delete-orphan")
+    def image_url(self):
+        """Return image for pet -- bespoke or generic."""
+
+        return self.photo_url or DEFAULT_IMAGE_URL
+    # posts = db.relationship("Post", backref="user", cascade="all, delete-orphan")
     
-    @property
-    def full_name(self):
-        """Return full name of user."""
+    # @property
+    # def full_name(self):
+    #     """Return full name of user."""
 
-        return f"{self.first_name} {self.last_name}"
-
-
-class Post(db.Model):
-    """Table user posts"""
-
-    __tablename__ = "posts"
-    id = db.Column (db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column (db.Text, nullable=False, unique=False)
-    content = db.Column (db.Text, nullable=False, unique=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
-    user_id = db.Column (db.Integer, db.ForeignKey('users.id'), nullable=False)
-
-    @property
-    def friendly_date(self):
-        """Return nicely-formatted date."""
-
-        return self.created_at.strftime("%a %b %-d  %Y, %-I:%M %p") #explore this with Mentor as this is part of further study
+    #     return f"{self.first_name} {self.last_name}"
 
 
-class PostTag(db.Model):
-    """Tag on a post."""
+# class Post(db.Model):
+#     """Table user posts"""
 
-    __tablename__ = "posts_tags"
+#     __tablename__ = "posts"
+#     id = db.Column (db.Integer, primary_key=True, autoincrement=True)
+#     title = db.Column (db.Text, nullable=False, unique=False)
+#     content = db.Column (db.Text, nullable=False, unique=False)
+#     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
+#     user_id = db.Column (db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), primary_key=True)
-    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+#     @property
+#     def friendly_date(self):
+#         """Return nicely-formatted date."""
+
+#         return self.created_at.strftime("%a %b %-d  %Y, %-I:%M %p") #explore this with Mentor as this is part of further study
 
 
-class Tag(db.Model):
-    """Tag that can be added to posts."""
+# class PostTag(db.Model):
+#     """Tag on a post."""
 
-    __tablename__ = 'tags'
+#     __tablename__ = "posts_tags"
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Text, nullable=False, unique=True)
+#     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), primary_key=True)
+#     tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), primary_key=True)
 
-    posts = db.relationship(
-        'Post',
-        secondary="posts_tags",
-        # cascade="all,delete",
-        backref="tags",
-    )
+
+# class Tag(db.Model):
+#     """Tag that can be added to posts."""
+
+#     __tablename__ = 'tags'
+
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.Text, nullable=False, unique=True)
+
+#     posts = db.relationship(
+#         'Post',
+#         secondary="posts_tags",
+#         # cascade="all,delete",
+#         backref="tags",
+#     )
 
 
 def connect_db(app):
