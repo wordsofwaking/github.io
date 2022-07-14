@@ -1,76 +1,87 @@
-"""24.1WTForms"""
+# Having issues getting DB to load on homepage (there are two cupcakes in the original DB but Axios is not connecting); something I need to work through with my mentor
 
-from flask import Flask, url_for, render_template, redirect, flash, jsonify
-from models import db, connect_db, Pet
-from forms import AddPetForm, EditPetForm
+"""Flask app for Cupcakes"""
+
+from flask import Flask, request, jsonify, render_template
+
+from models import db, connect_db, Cupcake
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///wtforms'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = False
-app.config['SECRET_KEY'] = 'secret'
 
-from flask_debugtoolbar import DebugToolbarExtension
-debug = DebugToolbarExtension(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = "secret-key"
 
 connect_db(app)
-db.create_all()
-
 
 
 @app.route("/")
-def list_pets():
-    """List all pets."""
+def root():
+    """Homepage"""
 
-    pets = Pet.query.all()
-    return render_template("pet_list.html", pets=pets)
-
-
-@app.route("/add", methods=["GET", "POST"])
-def add_pet():
-    """Add a pet."""
-
-    form = AddPetForm()
-
-    if form.validate_on_submit():
-        data = {k: v for k, v in form.data.items() if k != "csrf_token"}
-        new_pet = Pet(**data)
-        # new_pet = Pet(name=form.name.data, age=form.age.data, ...)
-        db.session.add(new_pet)
-        db.session.commit()
-        flash(f"{new_pet.name} added.")
-        return redirect(url_for('list_pets'))
-
-    else:
-        # re-present form for editing
-        return render_template("pet_add_form.html", form=form)
+    return render_template("index.html")
 
 
-@app.route("/<int:pet_id>", methods=["GET", "POST"])
-def edit_pet(pet_id):
-    """Edit pet."""
+@app.route("/api/cupcakes")
+def list_cupcakes():
+    """Return cupcake list"""
 
-    pet = Pet.query.get_or_404(pet_id)
-    form = EditPetForm(obj=pet)
-
-    if form.validate_on_submit():
-        pet.notes = form.notes.data
-        pet.available = form.available.data
-        pet.photo_url = form.photo_url.data
-        db.session.commit()
-        flash(f"{pet.name} updated.")
-        return redirect(url_for('list_pets'))
-
-    else:
-        # failed; re-present form for editing
-        return render_template("pet_edit_form.html", form=form, pet=pet)
+    cupcakes = [cupcake.to_dict() for cupcake in Cupcake.query.all()]
+    return jsonify(cupcakes=cupcakes)
 
 
-@app.route("/api/pets/<int:pet_id>", methods=['GET'])
-def api_get_pet(pet_id):
-    """Return basic info about pet in JSON."""
+@app.route("/api/cupcakes", methods=["POST"])
+def create_cupcake():
+    """Add cupcake"""
 
-    pet = Pet.query.get_or_404(pet_id)
-    info = {"name": pet.name, "age": pet.age}
+    data = request.json
 
-    return jsonify(info)
+    cupcake = Cupcake(
+        flavor=data['flavor'],
+        rating=data['rating'],
+        size=data['size'],
+        image=data['image'] or None)
+
+    db.session.add(cupcake)
+    db.session.commit()
+
+    return (jsonify(cupcake=cupcake.to_dict()), 201)
+
+
+@app.route("/api/cupcakes/<int:cupcake_id>")
+def get_cupcake(cupcake_id):
+    """Return data on cupcake <id>"""
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+    return jsonify(cupcake=cupcake.to_dict())
+
+
+@app.route("/api/cupcakes/<int:cupcake_id>", methods=["PATCH"])
+def update_cupcake(cupcake_id):
+    """Update cupcake"""
+
+    data = request.json
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    cupcake.flavor = data['flavor']
+    cupcake.rating = data['rating']
+    cupcake.size = data['size']
+    cupcake.image = data['image']
+
+    db.session.add(cupcake)
+    db.session.commit()
+
+    return jsonify(cupcake=cupcake.to_dict())
+
+
+@app.route("/api/cupcakes/<int:cupcake_id>", methods=["DELETE"])
+def remove_cupcake(cupcake_id):
+    """Delete cupcake"""
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    db.session.delete(cupcake)
+    db.session.commit()
+
+    return jsonify(message="Deleted")
