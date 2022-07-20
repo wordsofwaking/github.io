@@ -1,43 +1,38 @@
-"""Forms for adopt app."""
-
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SelectField, TextAreaField, BooleanField
-from wtforms.validators import InputRequired, Length, NumberRange, URL, Optional
+from wtforms import StringField, PasswordField
+from wtforms.validators import InputRequired, Length, NumberRange, Email, Optional, email_validator
+
+# class UserForm(FlaskForm):
+#     username = StringField("Username", validators=[InputRequired()])
+#     password = PasswordField("Password", validators=[InputRequired()])
 
 
-class AddPetForm(FlaskForm):
-    """Form for adding pets."""
+# class TweetForm(FlaskForm):
+#     text = StringField("Tweet Text", validators=[InputRequired()])
 
-    name = StringField(
-        "Pet Name",
-        validators=[InputRequired()],)
+class LoginForm(FlaskForm):
+    """Login form"""
 
-    species = SelectField(
-        "Species",
-        choices=[("cat", "Cat"), ("dog", "Dog"), ("porcupine", "Porcupine")],)
-
-    photo_url = StringField(
-        "Photo URL",
-        validators=[Optional(), URL()],)
-
-    age = IntegerField(
-        "Age",
-        validators=[Optional(), NumberRange(min=0, max=30)],)
-
-    notes = TextAreaField(
-        "Comments",
-        validators=[Optional(), Length(min=10)],)
+    username = StringField("Username", validators=[InputRequired(), Length(min=1, max=20)])
+    password = PasswordField("Password", validators=[InputRequired(), Length(min=6, max=55)])
 
 
-class EditPetForm(FlaskForm):
-    """Form for editing an existing pet."""
+class RegisterForm(FlaskForm):
+    """Registration form"""
 
-    photo_url = StringField(
-        "Photo URL",
-        validators=[Optional(), URL()],)
+    username = StringField("Username", validators=[InputRequired(), Length(min=1, max=20)])
+    password = PasswordField("Password", validators=[InputRequired(), Length(min=6, max=55)])
+    email = StringField("Email", validators=[InputRequired(), Email(), Length(max=50)])
+    first_name = StringField("First Name", validators=[InputRequired(), Length(max=30)])
+    last_name = StringField("Last Name", validators=[InputRequired(), Length(max=30)])
 
-    notes = TextAreaField(
-        "Comments",
-        validators=[Optional(), Length(min=10)],)
 
-    available = BooleanField("Available?")
+class FeedbackForm(FlaskForm):
+    """Feedback form"""
+
+    title = StringField("Title", validators=[InputRequired(), Length(max=100)])
+    content = StringField("Content", validators=[InputRequired()])
+
+
+class DeleteForm(FlaskForm):
+    """Delete form"""
