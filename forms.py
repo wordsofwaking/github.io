@@ -1,38 +1,27 @@
+"""Forms for playlist app."""
+
+from turtle import title
+from wtforms import SelectField, StringField, FloatField
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
-from wtforms.validators import InputRequired, Length, NumberRange, Email, Optional, email_validator
-
-# class UserForm(FlaskForm):
-#     username = StringField("Username", validators=[InputRequired()])
-#     password = PasswordField("Password", validators=[InputRequired()])
+from wtforms.validators import InputRequired, Optional
 
 
-# class TweetForm(FlaskForm):
-#     text = StringField("Tweet Text", validators=[InputRequired()])
+class PlaylistForm(FlaskForm):
+    """Form for adding playlists."""
 
-class LoginForm(FlaskForm):
-    """Login form"""
-
-    username = StringField("Username", validators=[InputRequired(), Length(min=1, max=20)])
-    password = PasswordField("Password", validators=[InputRequired(), Length(min=6, max=55)])
+    name = StringField("Playlist Name", validators=[InputRequired()])
+    description = StringField("Descripion", validators=[InputRequired()])
 
 
-class RegisterForm(FlaskForm):
-    """Registration form"""
+class SongForm(FlaskForm):
+    """Form for adding songs."""
 
-    username = StringField("Username", validators=[InputRequired(), Length(min=1, max=20)])
-    password = PasswordField("Password", validators=[InputRequired(), Length(min=6, max=55)])
-    email = StringField("Email", validators=[InputRequired(), Email(), Length(max=50)])
-    first_name = StringField("First Name", validators=[InputRequired(), Length(max=30)])
-    last_name = StringField("Last Name", validators=[InputRequired(), Length(max=30)])
+    title = StringField("Song Title", validators=[InputRequired()])
+    artist = StringField("Artist Name", validators=[InputRequired()])
 
 
-class FeedbackForm(FlaskForm):
-    """Feedback form"""
+# DO NOT MODIFY THIS FORM - EVERYTHING YOU NEED IS HERE
+class NewSongForPlaylistForm(FlaskForm):
+    """Form for adding a song to playlist."""
 
-    title = StringField("Title", validators=[InputRequired(), Length(max=100)])
-    content = StringField("Content", validators=[InputRequired()])
-
-
-class DeleteForm(FlaskForm):
-    """Delete form"""
+    song = SelectField('Song To Add', coerce=int)
